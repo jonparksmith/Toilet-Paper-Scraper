@@ -18,7 +18,7 @@ def check_price():
 	price = soup.find(id="priceblock_ourprice").get_text()
 	converted_price = float(price[5:7])
 
-	if converted_price < 20:
+	if converted_price < 10:
 		send_mail()
 
 def send_mail():
@@ -27,7 +27,7 @@ def send_mail():
 	server.starttls()
 	server.ehlo()
 
-	server.login('jonparksmith@gmail.com', 'ermyqtmawpuhsnzy')
+	server.login('YOUR EMAIL HERE', 'YOUR EMAIL PASSWORD HERE')
 
 	subject = "Price fell down!"
 	body = f"Check the amazon link and buy now: {URL}"
@@ -35,10 +35,10 @@ def send_mail():
 
 	try:
 		server.sendmail(
-			"jonparksmith@gmail.com",
-			"jpark@varonis.com", 
+			"YOUR EMAIL HERE",
+			"RECIPIENT EMAIL HERE", 
 			msg)
-		print('email has been successfully sent')
+		print('Email has been successfully sent')
 	except SMTPException:
 		print('Error: Email was not sent')
 	finally:

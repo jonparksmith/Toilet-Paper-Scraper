@@ -3,22 +3,31 @@ from bs4 import BeautifulSoup
 import smtplib
 import time
 
-URL = 'https://www.amazon.ca/Cottonelle-Toilet-Cleancare-Strong-Biodegradable/dp/B07BNS6J62/ref=sr_1_6?keywords=toilet+paper&qid=1588865515&sr=8-6'
+#Importing the confidential data from a private file
+from private import user_agent, email, email_password
 
-headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36'
-}
+#This URL is where the product lives that you are trying to get the price from
+URL = 'https://www.amazon.fr/Andrex-Classic-rouleaux-toilette-%C3%A9paisseurs/dp/B01KLXG3LA/ref=sr_1_5?__mk_fr_FR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&dchild=1&keywords=toilet+paper&qid=1590161900&sr=8-5'
+
+#You can find this by searching "My User Agent" in Google
+headers = {'User-Agent': user_agent}
 
 def check_price():
 
 	page = requests.get(URL, headers = headers)
 
-	soup = BeautifulSoup(page.content, 'html.parser')
+	soup = BeautifulSoup(page.content, "html.parser")
+	soup2 = BeautifulSoup(soup.prettify(),"html.parser")
 
-	title = soup.find(id ="productTitle").get_text()
-	price = soup.find(id="priceblock_ourprice").get_text()
-	converted_price = float(price[5:7])
+	title = soup2.find(id="title").get_text(strip=True)
 
-	if converted_price < 10:
+	price = soup2.find(id="priceblock_ourprice").get_text(strip=True)
+
+	#Depending on the price point, you may need to adjust this range to account for the total cost
+	converted_price = float(price[0:1])
+
+	#Here you can specify what your actual price threshold is
+	if converted_price < 40:
 		send_mail()
 
 def send_mail():
@@ -27,16 +36,16 @@ def send_mail():
 	server.starttls()
 	server.ehlo()
 
-	server.login('YOUR EMAIL HERE', 'YOUR EMAIL PASSWORD HERE')
+	server.login(email, email_password)
 
 	subject = "Price fell down!"
-	body = f"Check the amazon link and buy now: {URL}"
-	msg = f"Subject: {subject}\n\n{body}"
+	body = "Check the amazon link and buy now: {}".format(URL)
+	msg = "Subject: {}\n\n{}".format(subject,body)
 
 	try:
 		server.sendmail(
-			"YOUR EMAIL HERE",
-			"RECIPIENT EMAIL HERE", 
+			"pythontest@gmail.com",
+			email, 
 			msg)
 		print('Email has been successfully sent')
 	except SMTPException:
@@ -45,7 +54,5 @@ def send_mail():
 		server.quit()
 
 
-while True:
-	check_price()
-	time.sleep(86000)
+check_price()
 

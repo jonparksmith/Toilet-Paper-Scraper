@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import smtplib
-import time
+
 
 #Importing the confidential data from a private file
 from private import user_agent, email, email_password
